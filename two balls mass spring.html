@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <script src="math2D.js" ></script>
+ <script src="math3D.js" ></script>
+<script src="pixel.js" ></script>
+ <script src="mesh.js" ></script>
+<script src="DCLL.js"></script>
+<script src="smartcamera.js"></script>
+<script src="joint.js" ></script>
+<script src="skeleton.js"></script>
+<script src="physics.js"></script>
+<script src="graphicsappmanager.js" ></script>
+<script src="shape_box_n_ball.js" ></script>
+<script src="room.js" ></script>
+<script src="./two balls mass spring.js" ></script>
+
+
+<script type="application/x-javascript">
+    </script>
+
+</head>
+<body onload="load();Render();">
+   
+<table border="2" width="100%">
+    <tr><td>
+    <button onclick="timing();">Realtime Simulation</button>
+    <button onclick="stopit();">stop it</button>
+
+<!--
+<button onclick="avg_performance()">total clip project map performance</button>
+    <button onclick="graphics_manager.scene_objs[0].rebuild(graphics_manager.scene_objs[0].skel,
+	graphics_manager.vertices_pool,graphics_manager.lines_pool,graphics_manager.quads_pool);">save box mesh</button>
+
+    <button onclick="graphics_manager.scene_objs[1].rebuild(graphics_manager.scene_objs[1].skel,
+	graphics_manager.vertices_pool,graphics_manager.lines_pool,graphics_manager.quads_pool);">save ball mesh</button>
+-->
+
+
+<button  onclick="graphics_manager.scene_objs[1].physicsFunction = roomTestingMotion;" >use room testing</button>
+<button  onclick="graphics_manager.scene_objs[1].physicsFunction = emptyFunction;" >stop room testing</button>
+
+
+</td><td><b>Camera Rotations</b></td><td><b>Camera Linear Motion</b></td></tr>
+<tr><td>
+
+<table width="100%" border="1">
+<tr>
+<td> <canvas id="canvas6"  style="background-color: white;"  width="700px" height="500px"> your browser dosn't support  </canvas></td>
+<td width="30%" align="center">
+<!-- BUTTONS OF FALLING COLLIDABLE BALL -->
+
+ROOM ROTATION<br/>
+
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateXcw(0);
+Render();
+">rotate room X cw </button><br/>
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateXac(0);
+Render();
+">rotate room X ac </button><br/>
+
+
+
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateYcw(0);
+Render();
+">rotate room Y cw </button><br/>
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateYac(0);
+Render();
+">rotate room Y ac </button><br/>
+
+
+
+
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateZcw(0);
+Render();
+">rotate room Z cw </button><br/>
+    <button onclick="graphics_manager.scene_objs[1].skel.rotateZac(0);
+Render();
+">rotate room Z ac </button><br/>
+
+
+<br/>
+
+APPLY FORCES<br/>
+
+    <button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(.3,0,0);//
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (.3,0,0) </button><br/>
+
+    <button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(0,.3,0);//
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (0,.3,0) </button><br/>
+
+
+
+<button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(0,0,.3);//
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (0,0,.3) </button><br/>
+
+
+    <button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(.5,.5,1);//
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (.5,.5,1) </button><br/>
+
+    <button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(1.0,1.0,1);
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (1,1,1) </button><br/>
+
+    <button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].applyForce(1,2.0,1);
+timing();
+//graphics_manager.applyPhysics = emptyFunction;
+
+">Apply Force (1,2,1) </button><br/>
+
+<br/>
+
+APPLY DIFF. MASSES<br/>
+
+<button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+graphics_manager.scene_objs[0].mass += 0.2*graphics_manager.scene_objs[0].mass;
+document.getElementById('mass').innerHTML = graphics_manager.scene_objs[0].mass+'kg.<br/>';
+timing();
+">Increase By 20% </button><br/>
+
+<button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+if(graphics_manager.scene_objs[0].mass<= 0.01){return;}
+graphics_manager.scene_objs[0].mass -= 0.2*graphics_manager.scene_objs[0].mass;
+document.getElementById('mass').innerHTML = graphics_manager.scene_objs[0].mass+'kg.<br/>';
+timing();
+
+">Decrease By 20% </button><br/>
+
+<span id="mass"></span>
+
+<br/>
+
+APPLY DIFF. DRAG FORCES<br/>
+
+<button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+if(graphics_manager.scene_objs[0].drag >= 1)
+{graphics_manager.scene_objs[0].drag = 1;
+}
+else
+{graphics_manager.scene_objs[0].drag += .1*graphics_manager.scene_objs[0].drag;
+}
+graphics_manager.scene_objs[0].appliedForces[4][2].x = 0;
+graphics_manager.scene_objs[0].appliedForces[4][2].y = .0000098*graphics_manager.scene_objs[0].drag*graphics_manager.scene_objs[0].mass;
+graphics_manager.scene_objs[0].appliedForces[4][2].z = 0;
+
+document.getElementById('drag').innerHTML = graphics_manager.scene_objs[0].drag;
+timing();
+">Increase By 20% </button><br/>
+
+<button onclick="stopit();
+graphics_manager.applyPhysics = ballApplyPhysics;
+if(graphics_manager.scene_objs[0].drag <= 0){graphics_manager.scene_objs[0].drag = 0;}
+else{graphics_manager.scene_objs[0].drag -= .1*graphics_manager.scene_objs[0].drag;}
+
+graphics_manager.scene_objs[0].appliedForces[4][2].x = 0;
+graphics_manager.scene_objs[0].appliedForces[4][2].y = .0000098*graphics_manager.scene_objs[0].drag*graphics_manager.scene_objs[0].mass;
+graphics_manager.scene_objs[0].appliedForces[4][2].z = 0;
+
+document.getElementById('drag').innerHTML = graphics_manager.scene_objs[0].drag;
+timing();
+">Decrease By 20% </button><br/>
+
+<span id="drag"></span>
+</td>
+
+</tr></table>
+
+</td><td>
+
+    <table border='1'>
+        <tr><td></td><td><img  onclick="rra();"  src='up.jpg' width='50px' height='50px'  /></td><td></td></tr>
+        <tr><td ><img onclick="ruc();" src='left.jpg'  width='50px' height='50px'   /></td><td> <button onclick="raa();">front</button> <button onclick="rac();">back</button></td><td><img   onclick="rua();"   src='right.jpg'  width='50px' height='50px'   /></td></tr>
+        <tr><td></td><td><img   onclick="rrc();"   src='down.jpg' width='50px' height='50px'    /></td><td></td></tr>
+    </table>
+
+</td><td>
+    
+    <table border='1'>
+        <tr><td></td><td><img  onclick="up();"  src='up.jpg' width='50px' height='50px'  /></td><td></td></tr>
+        <tr><td ><img onclick="left();" src='left.jpg'  width='50px' height='50px'   /></td><td> <button onclick="front();">front</button> <button onclick="back();">back</button></td><td><img   onclick="right();"   src='right.jpg'  width='50px' height='50px'   /></td></tr>
+        <tr><td></td><td><img   onclick="down();"   src='down.jpg' width='50px' height='50px'    /></td><td></td></tr>
+    </table>
+</td>
+</tr>
+
+
+</table>
+
+
+</td></tr>
+<tr><td></td><td></td><td></td></tr>
+
+</table>
+
+<table width="100%" border="0" align="center">
+<tr><td colspan="3">
+
+</td></tr>
+
+<tr><td></td>
+
+<td align='left'>
+
+<script type="application/x-javascript">
+
+function load()
+{
+graphics_manager = new GraphicsAppManager(document.getElementById("canvas6"));
+graphics_manager.initializeScene = box_ball_1_viewport;	
+graphics_manager.initializeScene();
+}
+
+all_time = 0;
+num_times = 1.0;
+
+function rotate_once()
+{
+graphics_manager.scene_objs[0].skel.rotateYac(0);
+Render();
+}
+
+function avg_performance()
+{
+	console.log("average performance = "+(all_time/num_times));
+}
+
+anim = 0;
+
+function timing()
+{
+graphics_manager.setShownCanvasRender();
+graphics_manager.applyPhysics = ballApplyPhysics;
+
+anim = setInterval(Render,40);
+
+
+};
+
+function stopit()
+{
+clearInterval(anim);
+graphics_manager.applyPhysics = emptyFunction;
+
+};
+
+
+anim_physics = 0;
+function fall()
+{
+graphics_manager.frame_pointer = 0;
+anim_physics = setInterval(function Fall_Ball(){if(!graphics_manager.getRenderFrame()){clearInterval(anim_physics);};}
+,graphics_manager.time_interval-6);//max melliseconds time taken by putImage
+}
+
+
+/*
+function toggle_wired()
+{
+	graphics_manager.wired = !graphics_manager.wired;Render();
+}
+*/
+        function Render(){
+                        
+          // graphics_manager.clearCanvas();
+	t0 = performance.now();
+	graphics_manager.render();
+	t1 = performance.now();
+
+	//console.log("new clip project map & texture for 8 vertices took:"+(t1-t0)+" milliseconds");
+
+	all_time += (t1 - t0);
+	num_times += 1.0;
+
+        }
+
+function rac()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateZac();//Aim_clockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+
+function raa()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateZcw();//Aim_anticlockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+function rra()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateXac();//Right_anticlockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+function rrc()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateXcw();//Right_clockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+function rua()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateYac();//Up_anticlockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+function ruc()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].rotateYcw();//Up_clockwise();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+
+function left()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveLeft();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+            
+}
+
+
+function right()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveRight();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+}
+
+
+function up()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveUp();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+}
+
+
+function down()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveDown();
+Render();
+
+
+/*
+document.getElementById("illust").innerHTML += 
+
+    message= "Camera outside func.  Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    message+= "Camera outside func.  Aim: ("+graphics_manager.cameras[0].Motion.Aim.x+","+graphics_manager.cameras[0].Motion.Aim.y+","+graphics_manager.cameras[0].Motion.Aim.z+")<br/>";
+    
+document.getElementById("illust").innerHTML += message;
+    
+*/
+}
+
+
+function front()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveFront();
+Render();
+
+}
+
+
+function back()
+{
+graphics_manager.clearCanvas();
+graphics_manager.cameras[0].moveBack();
+Render();
+
+}
+
+
+function debug_camera()
+{
+    txt ="";
+    txt+= "Camera current Pos: ("+graphics_manager.cameras[0].Motion.Pos.x+","+graphics_manager.cameras[0].Motion.Pos.y+","+graphics_manager.cameras[0].Motion.Pos.z+")<br/>";
+    txt+= "Camera current Up: ("+graphics_manager.cameras[0].Motion.Up.x+","+graphics_manager.cameras[0].Motion.Up.y+","+graphics_manager.cameras[0].Motion.Up.z+")<br>";
+    txt+= "Camera current Right Vector: ("+graphics_manager.cameras[0].RightVector.x+","+graphics_manager.cameras[0].RightVector.y+","+graphics_manager.cameras[0].RightVector.z+")<br/>";
+    
+    txt+= "Camera Motion step: "+graphics_manager.cameras[0].MotionStep+"<br/>";
+    
+    return txt;
+}
+
+
+    </script>
+</td>
+</tr>
+<tr><td colspan="9">
+<div id="illust"></div>
+</td></tr>
+        </table>
+       
+    </body>
+</html>
